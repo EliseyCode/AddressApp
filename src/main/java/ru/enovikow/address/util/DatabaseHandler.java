@@ -154,6 +154,22 @@ public class DatabaseHandler {
         } else {
             return false;
         }
-
     }
+
+    public void updateContact(int id, String firstname, String lastname, String birthday, String address) {
+        String qu = "UPDATE CONTACTS\n" +
+                "SET NAME = '" + firstname + "',\n"
+                + "SURNAME = " + "'" + lastname + "',\n"
+                + "BIRTHDAY = " + "'" + birthday + "',\n"
+                + "ADDRESS = " + "'" + address + "'\n"
+                 + "WHERE ID = " + id;
+        System.out.println(qu);
+        databaseHandler.execAction(qu);
+    }
+
+    public void deleteContact(int id) {
+        String qu = "DELETE FROM CONTACTS WHERE id=" + id;
+        databaseHandler.execAction(qu);
+    }
+
 }

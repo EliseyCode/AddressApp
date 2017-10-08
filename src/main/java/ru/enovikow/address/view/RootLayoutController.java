@@ -18,8 +18,6 @@ import ru.enovikow.address.util.DatabaseHandler;
 
 import java.io.IOException;
 import java.net.URL;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.time.LocalDate;
 import java.util.ResourceBundle;
 
@@ -40,7 +38,7 @@ public class RootLayoutController extends UIFormController implements Initializa
     @FXML
     private Button exitButton;
 
-    private ObservableList<Person> personData = FXCollections.observableArrayList();
+    public static ObservableList<Person> personData;// = UIFormController.getPersonData();
     private final static String ADD_CONTACT_RESOURCE = "/UIForms/AddContact.fxml";
 
     private Stage primaryStage;
@@ -52,39 +50,52 @@ public class RootLayoutController extends UIFormController implements Initializa
         loadData();
     }
 
-    private void loadData() {
-//        DatabaseHandler handler = new DatabaseHandler();
-        String query = "SELECT * FROM contacts";
-        ResultSet rs = databaseHandler.execQuery(query);
-        try {
-            while (rs.next()) {
-                Integer ID = rs.getInt("ID");
-                String name = rs.getString("NAME");
-                String surname = rs.getString("SURNAME");
-                LocalDate birthday = rs.getDate("BIRTHDAY").toLocalDate();
-                String address = rs.getString("ADDRESS");
-
-                personData.add(new Person(ID, name, surname, address, birthday));
-            }
-
-            personTableView.setItems(personData);
-            IDColumn.setCellValueFactory(cellData -> cellData.getValue().getIDProperty().asObject());
-            firstnameColumn.setCellValueFactory(cellData -> cellData.getValue().getFirstNameProperty());
-            surnameColumn.setCellValueFactory(cellData -> cellData.getValue().getLastNameProperty());
-            birthdayColumn.setCellValueFactory(cellData -> cellData.getValue().getBirthdayProperty());
-            addressColumn.setCellValueFactory(cellData -> cellData.getValue().getAddressProperty());
-        } catch (SQLException e) {
-        }
+    @Override
+    protected void loadData() {
+        super.loadData();
+        personData = UIFormController.getPersonData();
+        personTableView.setItems(personData);
+        IDColumn.setCellValueFactory(cellData -> cellData.getValue().getIDProperty().asObject());
+        firstnameColumn.setCellValueFactory(cellData -> cellData.getValue().getFirstNameProperty());
+        surnameColumn.setCellValueFactory(cellData -> cellData.getValue().getLastNameProperty());
+        birthdayColumn.setCellValueFactory(cellData -> cellData.getValue().getBirthdayProperty());
+        addressColumn.setCellValueFactory(cellData -> cellData.getValue().getAddressProperty());
     }
 
     public RootLayoutController() {
     }
 
     public void openAddContact(ActionEvent actionEvent) {
-        showPersonEditDialog();
+        showNewContactDialog();
     }
 
-    public boolean showPersonEditDialog() {
+    public void editContactsButtonAction() {
+        showEditContactDialog();
+    }
+
+    private void showEditContactDialog() {
+        try {
+            FXMLLoader loader = new FXMLLoader();
+            loader.setLocation(RootLayoutController.class.getResource("/UIForms/EditContactDialog.fxml"));
+            AnchorPane page = loader.load();
+
+            Stage dialogStage = new Stage();
+            dialogStage.initModality(Modality.WINDOW_MODAL);
+
+            Scene scene = new Scene(page);
+            dialogStage.setScene(scene);
+
+            EditContactController controller = loader.getController();
+            controller.setStage(dialogStage);
+            controller.setPersonData(personData);
+            dialogStage.showAndWait();
+            loadData();
+        } catch (IOException e) {
+
+        }
+    }
+
+    public boolean showNewContactDialog() {
         try {
             FXMLLoader loader = new FXMLLoader();
             loader.setLocation(RootLayoutController.class.getResource(ADD_CONTACT_RESOURCE));
@@ -97,7 +108,7 @@ public class RootLayoutController extends UIFormController implements Initializa
             Scene scene = new Scene(page);
             dialogStage.setScene(scene);
 
-            PersonEditDialog controller = loader.getController();
+            AddContactController controller = loader.getController();
             controller.setDialogStage(dialogStage);
             dialogStage.showAndWait();
 

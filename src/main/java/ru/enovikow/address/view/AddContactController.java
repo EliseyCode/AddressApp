@@ -10,7 +10,7 @@ import ru.enovikow.address.util.DatabaseHandler;
 import java.net.URL;
 import java.util.ResourceBundle;
 
-public class PersonEditDialog implements Initializable{
+public class AddContactController implements Initializable{
 
     @FXML
     private TextField firstnameTextField;
@@ -57,7 +57,6 @@ public class PersonEditDialog implements Initializable{
     }
 
     public void cancelButtonAction(ActionEvent actionEvent) {
-//        ((Stage)firstnameTextField.getScene().getWindow()).close();
         dialogStage.close();
 
     }
